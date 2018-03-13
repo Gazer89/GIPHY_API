@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>api</title>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link rel="stylesheet" type="text/css" href="assests/css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Exo+2:800|Jomhuria|Fontdiner+Swanky" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script type="text/javascript" src="assests/javascript/js.js"></script>
+
+</head>
+
+<body>
+    <header>
+        Prime Time Animated Series Gif Generator
+    </header>
+
+    <div class="container-fluid">
+        <div class="col-sm-8">
+            <div class="row">
+                <p>CLick a button to generate GIF's for the name of the show on the button!</p>
+            </div>
+            <div class="row">
+                <div id="newbuttons"
+                ></div>
+            </div>
+            <div class="row">
+                <div id="gifs" >
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">  
+            <div class="row">
+                <p></p>
+            </div>
+            <div class="row" id="addbutton">
+                <form>
+                    <label for="iteminput" id="instruct">Input The Name Of Your Favorite Animated Primtime TV Show</label><br><br>
+                    <input type="text" id="iteminput"><br><br>
+                    <input id="add-item" type="submit" class="btn btn-primary" value="Add Button">
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var apikey = "&api_key=PjdDeIXV3C64o3SUtVxbLI0lTfODKeU5"
+        var limit = 9;
+        var topiclist = ["Simpsons", "King of the Hill", "Venture Bros"];
+        var gifstillimg;
+        var gifactiveimg;
+            
+        function createbuttons() {
+            $("#newbuttons").empty();
+
+            for (var i = 0; i < topiclist.length; i++) {
+                var createbutton = $("<button class='btn btn-primary'>");
+                createbutton.addClass("topicbuttons");
+                createbutton.attr("topicname", topiclist[i]);
+                createbutton.text(topiclist[i]);
+                $("#newbuttons").append(createbutton);
+            }
+        }
+
+        $("#add-item").on("click", function(event) {
+            event.preventDefault();
+            var topic = $("#iteminput").val().trim();
+            topiclist.push(topic);
+            createbuttons();
+        });
+
+
+        function displaytopics() {
+
+        var topic = $(this).attr("topicname");
+        var queryURL = "http://api.giphy.com/v1/gifs/search?q="+ topic + apikey + "&limit="+ limit;
+
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+            }).then(function(response) {
+                var result = response.data;
+                // var displaygif = $("<div class='results'>")
+                for (j=0; j < result.length; j++) {
+                    var displaygif = $("<div class='results'>")
+                var gifrateing = $("<p>").text("Rateing: " + response.data[j].rating);
+                var giftitle = $("<p>").text("Title: " + response.data[j].title);
+                var stillimg = response.data[j].images.downsized_still.url;
+             
+
+                var activeimg = response.data[j].images.downsized.url;
+              
+                var displayimg = $("<img class='img-rounded'>").attr({
+                    src: stillimg,
+                    activeimg: activeimg,
+                    stillimg: stillimg,
+                    datastate: "still",
+                    class: "gif"
+                    });
+
+                if (response.data[j].rating !== "r") {
+                    var gif = $(displaygif).append(gifrateing, displayimg);
+                    
+                    $("#gifs").prepend(gif);
+                    }
+                }
+            });
+        };
+
+
+        function animiation() {    
+            var state = $(this).attr("datastate");
+
+                if (state === "still") {
+                    $(this).attr("src", ($(this).attr("activeimg")));
+                    $(this).attr("datastate", "animate");
+                    
+                    } 
+                else {
+                    $(this).attr("src", ($(this).attr("stillimg")));
+                    $(this).attr("datastate", "still");
+
+                }
+        }
+
+        function topicbutton (){
+            $(document).on("click", ".topicbuttons", displaytopics);
+        }
+        
+        
+
+        createbuttons();
+        topicbutton();
+        $(document).on("click", ".gif", animiation);
+    
+    </script>
+
+    
+</body>
+</html>
