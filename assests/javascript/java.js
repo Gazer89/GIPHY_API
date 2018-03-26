@@ -28,7 +28,7 @@ $("#add-item").on("click", function(event) {
 function displaytopics() {
 
 var topic = $(this).attr("topicname");
-var queryURL = "http://api.giphy.com/v1/gifs/search?q="+ topic + apikey + "&limit="+ limit;
+var queryURL = "https://api.giphy.com/v1/gifs/search?q="+ topic + apikey + "&limit="+ limit;
 
 $.ajax({
     url: queryURL,
